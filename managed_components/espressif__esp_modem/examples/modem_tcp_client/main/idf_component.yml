@@ -1,7 +1,9 @@
 dependencies:
   espressif/esp_modem:
-    version: "^1.0.1"
-    override_path: "../../../"
+    version: ^2
   espressif/mbedtls_cxx:
-    version: "*"
-    override_path: "../../../../mbedtls_cxx"
+    version: '*'
+  espressif/mqtt:
+    rules:
+    - if: idf_version >=6.0
+      version: ^1.0.0

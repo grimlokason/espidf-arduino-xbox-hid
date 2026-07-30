@@ -36,6 +36,12 @@ menu "esp-modem"
             The typical reason for failing SABM request without a delay is that
             some devices (SIM800) send MSC requests just after opening a new DLCI.
 
+    config ESP_MODEM_CMUX_DELAY_AFTER_NETIF_DISCONNECT
+        int "Delay in ms to wait before closing virtual terminal abd rigt after PPP disconnect(NETIF)"
+        default 0
+        help
+            Some devices might need a pause before sending disconnect command that closes
+            virtual terminal. This delay applies only in CMUX mode.
     config ESP_MODEM_CMUX_USE_SHORT_PAYLOADS_ONLY
         bool "CMUX to support only short payloads (<128 bytes)"
         default n
@@ -69,6 +75,9 @@ menu "esp-modem"
         help
             Some AT commands returns textual values which C-API copy as c-string to user allocated space,
             it also truncates the output data to this size. Increase this if some AT answers are truncated.
+            Callers of esp_modem_get_imsi(), esp_modem_get_imei(), esp_modem_get_operator_name(),
+            esp_modem_get_module_name(), esp_modem_at(), and esp_modem_at_raw() must allocate output
+            buffers of at least this many bytes (see ESP_MODEM_C_API_STR_BUF_SIZE).
 
     config ESP_MODEM_URC_HANDLER
         bool "Enable support for adding URC handler"
@@ -91,5 +100,26 @@ menu "esp-modem"
         help
             If enabled, the library dumps all transmitted and received data.
             This option is only used for debugging.
+
+    config ESP_MODEM_ENABLE_DEVELOPMENT_MODE
+        bool "Use development mode"
+        default n
+        help
+            We use pre-generated headers and sources with common AT commands.
+            This is useful for using ESP-MODEM library with IDEs and code navigation.
+            When developing ESP-MODEM library, it's usually more convenient
+            to work with sources directly, using C-preprocessor's metaprogramming.
+            Set this to 'y' if you're making changes to the actual sources of
+            the AT command definitions (typically in esp_modem_command_declare.inc)
+
+    config ESP_MODEM_USE_PPP_MODE
+        bool "Use PPP mode"
+        default y
+        select LWIP_PPP_SUPPORT
+        help
+            If enabled, the library can use PPP netif from lwip.
+            This is the default and most common setting.
+            But it's possible to disable it and use only AT commands,
+            in this case it's not required to enable LWIP_PPP_SUPPORT.
 
 endmenu
