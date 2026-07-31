@@ -56,10 +56,10 @@ void setup()
 void loop()
 {
     if(compositeHID.isConnected()){
-        testButtons();
-        testPads();
-        testTriggers();
-        testThumbsticks();
+        //testButtons();
+        //testPads();
+        //testTriggers();
+        //testThumbsticks();
     }
 }
 
