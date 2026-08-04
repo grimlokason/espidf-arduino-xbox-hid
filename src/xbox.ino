@@ -6,7 +6,8 @@
 #include <Preferences.h>
 
 #include "webpage.h"
-
+#include "leds.h"
+ 
 BleCompositeHID compositeHID("ESP32 SeriesX Controller", "Mystfit", 100);
 XboxGamepadDevice* gamepad;
 WebServer server(80);
@@ -221,6 +222,7 @@ void setupWebServer() {
     server.on("/channels", handleChannels);
     server.on("/status", handleStatus);
     server.on("/config", HTTP_POST, handleConfig);
+    setupLedWebRoutes(server);
     server.begin();
 }
 
@@ -231,6 +233,7 @@ void setup()
     Serial.begin(115200);
 
     loadPinsFromPrefs();
+    setupLeds();
     setupChannelPins(); // pinMode() doit etre fait AVANT de lire les boutons
 
     configModeActive = checkConfigModeCombo();
@@ -298,6 +301,7 @@ void loop()
         if (raw != channels[i].previousState) {
             channels[i].previousState = raw;
             changed = true;
+            updateLedForChannel(channels[i].name, raw);
 
             if (channels[i].type == CH_BUTTON) {
                 if (raw) gamepad->press(channels[i].xboxCode);
@@ -332,6 +336,7 @@ void loop()
 
     if (changed)
         gamepad->sendGamepadReport();
+        pixels.show();
 
     delay(4);
 }
